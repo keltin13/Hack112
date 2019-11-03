@@ -20,7 +20,7 @@ class MainMenuMode(Mode):
         canvas.create_rectangle(0, 0, mode.width, mode.height,
                                 fill = backgroundColor)
         canvas.create_text(mode.width//2, mode.height//2, fill = 'black',
-                        text = "press space to start")
+                        text = "Press space to start")
 
     def keyPressed(mode, event):
         if event.key == 'Space':    # Press 'Space' to go to game
@@ -29,6 +29,8 @@ class MainMenuMode(Mode):
 class GameMode(Mode):
     def redrawAll(mode, canvas):
         canvas.create_rectangle(0, 0, mode.width, mode.height, fill = 'black')
+        canvas.create_text(mode.width//2, mode.height//2, fill = 'white',
+                        text = "The game is here")
 
 class Introduction(GameMode):
     def __init__(self):
