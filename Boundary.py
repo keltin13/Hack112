@@ -4,12 +4,15 @@
 ##########################################
 
 class Boundary(object):
-    def __init__(self, name, left, top, right, bottom, scale):
+    def __init__(self, name, left, top, right, bottom, scale, enabled = True, order = -1, shiftY = 0, shiftX = 0):
         self.name = name
         self.left = left*scale
         self.top = top*scale
         self.right = right*scale
         self.bottom = bottom*scale
+        self.enabled = enabled
+        self.order = order
+        self.shiftX, self.shiftY = shiftX, shiftY
 
     def draw(self, canvas):
         canvas.create_rectangle(self.left, self.top,

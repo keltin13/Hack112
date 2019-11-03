@@ -10,7 +10,7 @@ class Player(object):
         self.pos = [x, y]
         self.width = 10
         self.height = 20
-        self.swimStamina = 75
+        self.swimStamina = 50
         self.gravity = -1
         self.underwater = False
         self.waterCount = self.swimStamina
@@ -55,8 +55,10 @@ class Player(object):
             self.velocity[0] = self.movementSpeed
 
     def standingOnPlatform(self):
-        return (self.app.checkInBounds(self.pos[0], self.pos[1] + 1 + self.height//2)
-                or self.pos[1] + self.height//2 + 1 > self.app.height) 
+        return ((self.app.checkInBounds(self.pos[0] + self.width//2, self.pos[1] + 1 + self.height//2)
+                or self.pos[1] + self.height//2 + 1 >= self.app.height) or 
+                (self.app.checkInBounds(self.pos[0] - self.width//2, self.pos[1] + 1 + self.height//2)
+                or self.pos[1] + self.height//2 + 1 >= self.app.height))
 
     def isUnderwater(self):
         if self.app.checkIntersect(self, self.app.waterBodies):
@@ -78,7 +80,9 @@ class Player(object):
 class WaterBoy(Player):
     def __init__(self, app, x, y):
         super().__init__(app, x, y)
-        self.swimStamina = 300
+        self.airStamina = 50
+        self.airCount = self.airStamina
+        self.swimStamina = 500
         self.waterCount = self.swimStamina
         self.name = "Aquaman"
 
@@ -90,8 +94,10 @@ class GravityBoy(Player):
         self.name = "GravityBoy"
 
     def standingOnPlatform(self):
-        return (self.app.checkInBounds(self.pos[0], self.pos[1] - 1 - self.height//2)
-                or self.pos[1] - self.height//2 - 1 <= 0)
+        return ((self.app.checkInBounds(self.pos[0] + self.width//2, self.pos[1] - 1 - self.height//2)
+                or self.pos[1] + self.height//2 + 1 <= 0) or 
+                (self.app.checkInBounds(self.pos[0] - self.width//2, self.pos[1] - 1 - self.height//2)
+                or self.pos[1] + self.height//2 + 1 <= 0))
 
     def returnToPlatform(self):
         while self.standingOnPlatform():
