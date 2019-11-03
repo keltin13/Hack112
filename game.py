@@ -155,8 +155,12 @@ class GameMode(Mode):
     def redrawAll(mode, canvas):
         player = mode.players[mode.activePlayer]
         canvas.create_rectangle(0, 0, mode.width, mode.height, fill = 'white')
-        canvas.create_text(mode.width//2, mode.height//2, fill = 'black',
-                        text = f"{player}, coords = {player.pos[0]}, {player.pos[1]}")
+        if isinstance(player,WaterBoy):
+            canvas.create_text(mode.width//2, mode.height//2, fill = 'black',
+                            text = f"{player}, air = {player.airCount}/{player.airStamina}")
+        else:
+            canvas.create_text(mode.width//2, mode.height//2, fill = 'black',
+                            text = f"{player}, air = {player.waterCount}/{player.swimStamina}")
         for water in mode.waterBodies:
             water.draw(canvas)
         for spike in mode.spikes:
