@@ -34,7 +34,7 @@ class Boundary(object):
     def getHashables(self):
         return self.name
 
-    def __eq__(self):
+    def __eq__(self, other):
         return (isinstance(other, Boundary) and
                 self.getHashables() == other.getHashables())
 
