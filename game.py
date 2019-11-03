@@ -219,62 +219,77 @@ class Level1(GameMode):
         self.createBoundaries()
         self.createWater()
         self.createSpikes()
+        self.numActives = -1
+        self.buttonLocations = [(360, 335), (360, 335), (360, 335), (400, 335), (515, 90)]
+        self.createButtons()
         self.init = [25, 400]
         self.players = [Player(self, self.init[0], self.init[1]),
                         GravityBoy(self, self.init[0], self.init[1]),
                         JumpMan(self, self.init[0], self.init[1]),
                         WaterBoy(self,self.init[0],self.init[1])]
         self.playerTypes = len(self.players)
+        self.activeButton = 0
         self.activePlayer = 0
         self.activeKeys = {'a': False, 'd': False, 'w': False, 's': False}
+    
+    def createButtons(self):
+        self.buttons = [None] * self.numActives
+        for boundary in self.boundaries:
+            if not boundary.enabled:
+                self.buttons[boundary.order] = (Button(self, self.buttonLocations[boundary.order][0],
+                                                self.buttonLocations[boundary.order][1], boundary))
+            if 'Shift' in boundary.name:
+                self.buttons[boundary.order] = (MovingButton(self, self.buttonLocations[boundary.order][0],
+                                                self.buttonLocations[boundary.order][1], boundary, 
+                                                boundary.left + boundary.shiftX, 
+                                                boundary.top + boundary.shiftY, 
+                                                boundary.right + boundary.shiftX, 
+                                                boundary.bottom + boundary.shiftY))
 
     def createBoundaries(self):
         self.boundaries = set()
-        self.boundaries.add(Boundary('1', 0, 150, 100, 170, self.scale))
-        self.boundaries.add(Boundary('2', 0, 450, 100, 470, self.scale))
-        self.boundaries.add(Boundary('3', 175, 520, 275, 540, self.scale))
-        self.boundaries.add(Boundary('4', 320, 535, 330, 605, self.scale))
-        self.boundaries.add(Boundary('5', 330, 595, 360, 605, self.scale))
-        self.boundaries.add(Boundary('6', 320, 505, 410, 535, self.scale))
-        self.boundaries.add(Boundary('7', 320, 485, 365, 505, self.scale))
-        self.boundaries.add(Boundary('8', 320, 380, 365, 445, self.scale))
-        self.boundaries.add(Boundary('9', 365, 380, 400, 395, self.scale))
-        self.boundaries.add(Boundary('10', 400, 150, 410, 395, self.scale))
-        self.boundaries.add(Boundary('11', 310, 285, 330, 305, self.scale))
-        self.boundaries.add(Boundary('12', 200, 230, 210, 250, self.scale))
-        self.boundaries.add(Boundary('13', 125 , 175, 175, 190, self.scale))
-        self.boundaries.add(Boundary('14', 410, 535, 440, 720, self.scale))
-        self.boundaries.add(Boundary('15', 440, 700, 600, 720, self.scale))
-        self.boundaries.add(Boundary('16', 600, 580, 700, 720, self.scale))
-        self.boundaries.add(Boundary('17', 740, 590, 840, 610, self.scale))
-        self.boundaries.add(Boundary('18', 700, 710, 760, 720, self.scale))
-        self.boundaries.add(Boundary('19', 760, 675, 770, 720, self.scale))
-        self.boundaries.add(Boundary('20', 770, 675, 830, 685, self.scale))
-        self.boundaries.add(Boundary('21', 830, 610, 840, 685, self.scale))
-        self.boundaries.add(Boundary('22', 900, 590, 1000, 900, self.scale))
-        self.boundaries.add(Boundary('23', 830, 550, 840, 590, self.scale))
-        self.boundaries.add(Boundary('24', 830, 530, 945, 550, self.scale))
-        self.boundaries.add(Boundary('25', 935, 550, 945, 590, self.scale))
-        self.boundaries.add(Boundary('26', 910, 250, 925, 500, self.scale))
-        self.boundaries.add(Boundary('27', 770, 560, 790, 570, self.scale))
-        self.boundaries.add(Boundary('28', 900, 300, 910, 320, self.scale))
-        self.boundaries.add(Boundary('29', 725, 400, 825, 420, self.scale))
-        self.boundaries.add(Boundary('30', 850, 235, 925, 250, self.scale))
-        self.boundaries.add(Boundary('31', 210, 0, 500, 10, self.scale))
-        self.boundaries.add(Boundary('32', 500, 0, 575, 20, self.scale))
-        self.boundaries.add(Boundary('33', 625, 10, 700, 20, self.scale))
-
-
-
+        self.boundaries.add(Boundary(self, '1', 0, 150, 100, 170, self.scale))
+        self.boundaries.add(Boundary(self, '2', 0, 450, 100, 470, self.scale))
+        self.boundaries.add(Boundary(self, '3', 175, 520, 275, 540, self.scale))
+        self.boundaries.add(Boundary(self, '4', 320, 535, 330, 605, self.scale))
+        self.boundaries.add(Boundary(self, '5', 330, 595, 360, 605, self.scale))
+        self.boundaries.add(Boundary(self, '6', 320, 505, 410, 535, self.scale))
+        self.boundaries.add(Boundary(self, '7', 320, 485, 365, 505, self.scale))
+        self.boundaries.add(Boundary(self, '8', 320, 380, 365, 445, self.scale))
+        self.boundaries.add(Boundary(self, '9', 365, 380, 400, 395, self.scale))
+        self.boundaries.add(Boundary(self, '10', 400, 150, 410, 395, self.scale))
+        self.boundaries.add(Boundary(self, '11', 310, 285, 330, 305, self.scale))
+        self.boundaries.add(Boundary(self, '12', 200, 230, 210, 250, self.scale))
+        self.boundaries.add(Boundary(self, '13', 125 , 175, 175, 190, self.scale))
+        self.boundaries.add(Boundary(self, '14', 410, 535, 440, 720, self.scale))
+        self.boundaries.add(Boundary(self, '15', 440, 700, 600, 720, self.scale))
+        self.boundaries.add(Boundary(self, '16', 600, 580, 700, 720, self.scale))
+        self.boundaries.add(Boundary(self, '17', 740, 590, 840, 610, self.scale))
+        self.boundaries.add(Boundary(self, '18', 700, 710, 760, 720, self.scale))
+        self.boundaries.add(Boundary(self, '19', 760, 675, 770, 720, self.scale))
+        self.boundaries.add(Boundary(self, '20', 770, 675, 830, 685, self.scale))
+        self.boundaries.add(Boundary(self, '21', 830, 610, 840, 685, self.scale))
+        self.boundaries.add(Boundary(self, '22', 900, 590, 1000, 900, self.scale))
+        self.boundaries.add(Boundary(self, '23', 830, 550, 840, 590, self.scale))
+        self.boundaries.add(Boundary(self, '24', 830, 530, 945, 550, self.scale))
+        self.boundaries.add(Boundary(self, '25', 935, 550, 945, 590, self.scale))
+        self.boundaries.add(Boundary(self, '26', 910, 250, 925, 500, self.scale))
+        self.boundaries.add(Boundary(self, '27', 770, 560, 790, 570, self.scale))
+        self.boundaries.add(Boundary(self, '28', 900, 300, 910, 320, self.scale))
+        self.boundaries.add(Boundary(self, '29', 725, 400, 825, 420, self.scale))
+        self.boundaries.add(Boundary(self, '30', 850, 235, 925, 250, self.scale))
+        self.boundaries.add(Boundary(self, '31', 210, 0, 500, 10, self.scale))
+        self.boundaries.add(Boundary(self, '32', 500, 0, 575, 20, self.scale))
+        self.boundaries.add(Boundary(self, '33', 625, 10, 700, 20, self.scale))
 
     def createWater(self):
         self.waterBodies = set()
-        self.waterBodies.add(Water(0, 600, 1600, 900, self.scale))
+        self.waterBodies.add(Water(self, 0, 600, 1600, 900, self.scale))
 
     def createSpikes(self):
         self.spikes = set()
-        self.spikes.add(Spikes('Spike 1', 0, 0, 50, 10, self.scale))
-        self.spikes.add(Spikes('Spike 2', 50, 0, 100, 10, self.scale))
+        self.spikes.add(Spikes(self, 'Spike 1', 0, 0, 50, 10, self.scale))
+        self.spikes.add(Spikes(self, 'Spike 2', 50, 0, 100, 10, self.scale))
 
 # From http://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
 class MyModalApp(ModalApp):

@@ -47,5 +47,5 @@ class Spikes(Boundary):
         start = self.left + 25
         photoImage = self.app.getCachedImages(self.sprite)
         while start <= self.right - self.left:
-            canvas.create_image(start, self.bottom, image=photoImage)
+            canvas.create_image(start, self.top + 25, image=photoImage)
             start += 50

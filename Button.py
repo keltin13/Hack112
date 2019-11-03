@@ -1,5 +1,15 @@
+##########################################
+##      Suicide Squad - Hack112         ##
+## Keltin Grimes, Alex White, Kevin Xie ##
+##########################################
+
+from tkinter import *
+from PIL import *
+import random
+
 class Button(object):
-    def __init__(self, x, y, boundary, enabled = True):
+    def __init__(self, app, x, y, boundary, enabled = True):
+        self.app = app
         self.x = x
         self.y = y
         self.r = 5
@@ -9,19 +19,23 @@ class Button(object):
         self.bottom = self.y + self.r
         self.boundary = boundary
         self.enabled = enabled
+        self.importSprite()
 
     def activate(self):
         self.boundary.enabled = True
     
     def draw(self, canvas):
-        canvas.create_oval(self.x - self.r, self.y - self.r,
-                           self.x + self.r, self.y + self.r,
-                           fill = "blue")
+        photoImage = self.app.getCachedImages(self.sprite)
+        canvas.create_image(self.x, self.y, image=photoImage)
+    
+    def importSprite(self):
+        candy = 'Assets/lollipopFruitGreen.png'
+        self.sprite = (Image.open(candy).resize((10, 10)))
 
 
 class MovingButton(Button):
-    def __init__(self, x, y, boundary, left, top, right, bottom):
-        super().__init__(x, y, boundary)
+    def __init__(self, app, x, y, boundary, left, top, right, bottom):
+        super().__init__(app, x, y, boundary)
         self.newLeft = left
         self.newTop = top
         self.newRight = right
