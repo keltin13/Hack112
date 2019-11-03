@@ -25,7 +25,7 @@ class MainMenuMode(Mode):
 
     def keyPressed(mode, event):
         if event.key == 'Space':    # Press 'Space' to go to game
-            mode.app.setActiveMode(mode.app.level1)
+            mode.app.setActiveMode(mode.app.introLevel)
 
 class GameMode(Mode):
     def appStarted(mode):
@@ -156,7 +156,7 @@ class Introduction(GameMode):
         self.numActives = 5
         self.buttonLocations = [(360, 335), (360, 335), (360, 335), (400, 335), (515, 90)]
         self.createButtons()
-        self.init = [25, 250]
+        self.init = [25*self.scale, 250*self.scale]
         self.players = [Player(self, self.init[0], self.init[1]),
                         GravityBoy(self, self.init[0], self.init[1]),
                         JumpMan(self, self.init[0], self.init[1]),
@@ -202,10 +202,10 @@ class Introduction(GameMode):
             if 'Shift' in boundary.name:
                 self.buttons[boundary.order] = (MovingButton(self, self.buttonLocations[boundary.order][0],
                                                 self.buttonLocations[boundary.order][1], boundary, 
-                                                boundary.left + boundary.shiftX, 
-                                                boundary.top + boundary.shiftY, 
-                                                boundary.right + boundary.shiftX, 
-                                                boundary.bottom + boundary.shiftY))
+                                                boundary.left + boundary.shiftX*self.scale, 
+                                                boundary.top + boundary.shiftY*self.scale, 
+                                                boundary.right + boundary.shiftX*self.scale, 
+                                                boundary.bottom + boundary.shiftY*self.scale))
 
     def createSpikes(self):
         self.spikes = set()
@@ -303,7 +303,6 @@ class MyModalApp(ModalApp):
 
 def main():
     app = MyModalApp(width=1600, height=900)
-    #app = MyModalApp(width=960, height=540)
 
 if __name__ == '__main__':
     main()

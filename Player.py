@@ -10,14 +10,14 @@ class Player(object):
     def __init__(self, app, x, y):
         self.app = app
         self.pos = [x, y]
-        self.width = 20
-        self.height = 30
+        self.width = 20*self.app.scale
+        self.height = 30*self.app.scale
         self.swimStamina = 50
-        self.gravity = -1
+        self.gravity = -1*self.app.scale
         self.underwater = False
         self.waterCount = self.swimStamina
-        self.jumpForce = 8
-        self.movementSpeed = 5
+        self.jumpForce = 8*self.app.scale
+        self.movementSpeed = 5*self.app.scale
         self.velocity = [0,0]
         self.name = "Normal Boy"
         self.importSprites()
@@ -42,9 +42,6 @@ class Player(object):
 
     def draw(self, canvas):
         x, y = self.pos[0], self.pos[1]
-        # canvas.create_rectangle((x-self.width//2), (y-self.height//2),
-        #                         (x+self.width//2), (y+self.height//2),
-        #                         fill = None, outline = 'black')
         sprite = self.sprites[self.spriteCounter]
         if self.facingRight:
             photoImage = self.app.getCachedImages(sprite)
@@ -124,8 +121,8 @@ class WaterBoy(Player):
 class GravityBoy(Player):
     def __init__(self, app, x, y):
         super().__init__(app, x, y)
-        self.gravity = 1
-        self.jumpForce = -8
+        self.gravity = 1*self.app.scale
+        self.jumpForce = -8*self.app.scale
         self.name = "GravityBoy"
 
     def importSprites(self):
@@ -154,7 +151,7 @@ class GravityBoy(Player):
 class JumpMan(Player):
     def __init__(self, app, x, y):
         super().__init__(app, x, y)
-        self.jumpForce = 14
+        self.jumpForce = 14*self.app.scale
         self.swimStamina = 0
         self.waterCount = self.swimStamina
         self.name = "Jump Man"
