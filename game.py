@@ -110,7 +110,7 @@ class GameMode(Mode):
             player.velocity[0] = 0
             if player.velocity[1] < 0:
                 player.velocity[1] = 0
-            player.velocity[1] -= player.gravity * 0.1       
+            player.velocity[1] -= player.gravity * 0.1
             if player.waterCount <= 0:
                 player.reset()
         else:
@@ -177,7 +177,7 @@ class Introduction(GameMode):
     def __init__(self):
         super().__init__()
         super().appStarted()
-        self.scale = 2
+        self.scale = 1
         self.createBoundaries()
         self.createWater()
         self.createSpikes()
@@ -199,13 +199,13 @@ class Introduction(GameMode):
         self.boundaries.add(Boundary(self, '2', 0, 315, 50, 325, self.scale))
         self.boundaries.add(Boundary(self, '3', 55, 345, 105, 355, self.scale))
         self.boundaries.add(Boundary(self, '4', 60, 50, 110, 60, self.scale))
-        self.boundaries.add(Boundary(self, 'Shift 1', 150, 440, 300, 450, self.scale, 
+        self.boundaries.add(Boundary(self, 'Shift 1', 150, 440, 300, 450, self.scale,
                                      order = 0, shiftY = -95))
-        self.boundaries.add(Boundary(self, 'Shift 2', 150, 150, 295, 355, self.scale, 
+        self.boundaries.add(Boundary(self, 'Shift 2', 150, 150, 295, 355, self.scale,
                                      order = 1, shiftY = -50))
-        self.boundaries.add(Boundary(self, 'Shift 3', 150, 100, 300, 110, self.scale, 
+        self.boundaries.add(Boundary(self, 'Shift 3', 150, 100, 300, 110, self.scale,
                                      order = 2, shiftY = -50))
-        self.boundaries.add(Boundary(self, 'Shift 4', 375, 280, 385, 400, self.scale, 
+        self.boundaries.add(Boundary(self, 'Shift 4', 375, 280, 385, 400, self.scale,
                                      order = 4, shiftY = 75))
         self.boundaries.add(Boundary(self, '5', 350, 345, 450, 355, self.scale))
         self.boundaries.add(Boundary(self, '6', 325, 60, 425, 70, self.scale))
@@ -259,16 +259,16 @@ class Level1(GameMode):
         self.activeButton = 0
         self.activePlayer = 0
         self.activeKeys = {'a': False, 'd': False, 'w': False, 's': False}
-    
+
     def createButtons(self):
         self.buttons = [None] * self.numActives
         for boundary in self.boundaries:                      
             if 'Shift' in boundary.name:
                 self.buttons[boundary.order] = (MovingButton(self, self.buttonLocations[boundary.order][0],
-                                                self.buttonLocations[boundary.order][1], boundary, 
-                                                boundary.left + boundary.shiftX, 
-                                                boundary.top + boundary.shiftY, 
-                                                boundary.right + boundary.shiftX, 
+                                                self.buttonLocations[boundary.order][1], boundary,
+                                                boundary.left + boundary.shiftX,
+                                                boundary.top + boundary.shiftY,
+                                                boundary.right + boundary.shiftX,
                                                 boundary.bottom + boundary.shiftY))
             elif boundary.order != -1:
                 self.buttons[boundary.order] = (NewButton(self, self.buttonLocations[boundary.order][0],
