@@ -77,7 +77,7 @@ class GameMode(Mode):
             player.velocity[0] = 0
             if player.velocity[1] < 0:
                 player.velocity[1] = 0
-            player.velocity[1] -= player.gravity * 0.1       
+            player.velocity[1] -= player.gravity * 0.1
             if player.waterCount <= 0:
                 player.reset()
         else:
@@ -107,7 +107,7 @@ class GameMode(Mode):
         canvas.create_text(mode.width//2, mode.height//2, fill = 'black',
                         text = f"{player}, swimTime = {player.waterCount}/{player.swimStamina}")
         for water in mode.waterBodies:
-            water.draw(canvas, mode.scale)
+            water.draw(canvas)
         for spike in mode.spikes:
             spike.draw(canvas)
         for boundary in mode.boundaries:
