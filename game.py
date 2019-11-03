@@ -25,7 +25,7 @@ class MainMenuMode(Mode):
 
     def keyPressed(mode, event):
         if event.key == 'Space':    # Press 'Space' to go to game
-            mode.app.setActiveMode(mode.app.introLevel)
+            mode.app.setActiveMode(mode.app.level1)
 
 class GameMode(Mode):
     def appStarted(mode):
@@ -149,7 +149,7 @@ class Introduction(GameMode):
     def __init__(self):
         super().__init__()
         super().appStarted()
-        self.scale = 1
+        self.scale = 2
         self.createBoundaries()
         self.createWater()
         self.createSpikes()
@@ -214,6 +214,67 @@ class Introduction(GameMode):
 class Level1(GameMode):
     def __init__(self):
         super().__init__()
+        super().appStarted()
+        self.scale = 1
+        self.createBoundaries()
+        self.createWater()
+        self.createSpikes()
+        self.init = [25, 400]
+        self.players = [Player(self, self.init[0], self.init[1]),
+                        GravityBoy(self, self.init[0], self.init[1]),
+                        JumpMan(self, self.init[0], self.init[1]),
+                        WaterBoy(self,self.init[0],self.init[1])]
+        self.playerTypes = len(self.players)
+        self.activePlayer = 0
+        self.activeKeys = {'a': False, 'd': False, 'w': False, 's': False}
+
+    def createBoundaries(self):
+        self.boundaries = set()
+        self.boundaries.add(Boundary('1', 0, 150, 100, 170, self.scale))
+        self.boundaries.add(Boundary('2', 0, 450, 100, 470, self.scale))
+        self.boundaries.add(Boundary('3', 175, 520, 275, 540, self.scale))
+        self.boundaries.add(Boundary('4', 320, 535, 330, 605, self.scale))
+        self.boundaries.add(Boundary('5', 330, 595, 360, 605, self.scale))
+        self.boundaries.add(Boundary('6', 320, 505, 410, 535, self.scale))
+        self.boundaries.add(Boundary('7', 320, 485, 365, 505, self.scale))
+        self.boundaries.add(Boundary('8', 320, 380, 365, 445, self.scale))
+        self.boundaries.add(Boundary('9', 365, 380, 400, 395, self.scale))
+        self.boundaries.add(Boundary('10', 400, 150, 410, 395, self.scale))
+        self.boundaries.add(Boundary('11', 310, 285, 330, 305, self.scale))
+        self.boundaries.add(Boundary('12', 200, 230, 210, 250, self.scale))
+        self.boundaries.add(Boundary('13', 125 , 175, 175, 190, self.scale))
+        self.boundaries.add(Boundary('14', 410, 535, 440, 720, self.scale))
+        self.boundaries.add(Boundary('15', 440, 700, 600, 720, self.scale))
+        self.boundaries.add(Boundary('16', 600, 580, 700, 720, self.scale))
+        self.boundaries.add(Boundary('17', 740, 590, 840, 610, self.scale))
+        self.boundaries.add(Boundary('18', 700, 710, 760, 720, self.scale))
+        self.boundaries.add(Boundary('19', 760, 675, 770, 720, self.scale))
+        self.boundaries.add(Boundary('20', 770, 675, 830, 685, self.scale))
+        self.boundaries.add(Boundary('21', 830, 610, 840, 685, self.scale))
+        self.boundaries.add(Boundary('22', 900, 590, 1000, 900, self.scale))
+        self.boundaries.add(Boundary('23', 830, 550, 840, 590, self.scale))
+        self.boundaries.add(Boundary('24', 830, 530, 945, 550, self.scale))
+        self.boundaries.add(Boundary('25', 935, 550, 945, 590, self.scale))
+        self.boundaries.add(Boundary('26', 910, 250, 925, 500, self.scale))
+        self.boundaries.add(Boundary('27', 770, 560, 790, 570, self.scale))
+        self.boundaries.add(Boundary('28', 900, 300, 910, 320, self.scale))
+        self.boundaries.add(Boundary('29', 725, 400, 825, 420, self.scale))
+        self.boundaries.add(Boundary('30', 850, 235, 925, 250, self.scale))
+        self.boundaries.add(Boundary('31', 210, 0, 500, 10, self.scale))
+        self.boundaries.add(Boundary('32', 500, 0, 575, 20, self.scale))
+        self.boundaries.add(Boundary('33', 625, 10, 700, 20, self.scale))
+
+
+
+
+    def createWater(self):
+        self.waterBodies = set()
+        self.waterBodies.add(Water(0, 600, 1600, 900, self.scale))
+
+    def createSpikes(self):
+        self.spikes = set()
+        self.spikes.add(Spikes('Spike 1', 0, 0, 50, 10, self.scale))
+        self.spikes.add(Spikes('Spike 2', 50, 0, 100, 10, self.scale))
 
 # From http://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
 class MyModalApp(ModalApp):
@@ -226,7 +287,7 @@ class MyModalApp(ModalApp):
         app.timerDelay = 50
 
 def main():
-    app = MyModalApp(width=800, height=450)
+    app = MyModalApp(width=1600, height=900)
     #app = MyModalApp(width=960, height=540)
 
 if __name__ == '__main__':
