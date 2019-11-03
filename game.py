@@ -133,7 +133,7 @@ class Introduction(GameMode):
 
     def createBoundaries(self):
         self.boundaries = set()
-        self.boundaries.add(Boundary('1', 0, 200, 50, 210, self.scale))
+        self.boundaries.add(Boundary('1', 0, 150, 50, 160, self.scale))
         self.boundaries.add(Boundary('2', 0, 315, 50, 325, self.scale))
         self.boundaries.add(Boundary('3', 55, 345, 105, 355, self.scale))
         self.boundaries.add(Boundary('4', 60, 50, 110, 60, self.scale))
@@ -142,7 +142,15 @@ class Introduction(GameMode):
         self.boundaries.add(Boundary('Shift 2', 150, 150, 300, 400, self.scale))
         self.boundaries.add(Boundary('Shift 3', 150, 100, 300, 110, self.scale))
 
-        self.boundaries.add(Boundary('5', 375, 315, 385, 450, self.scale))
+        self.boundaries.add(Boundary('Shift 4', 375, 280, 385, 400, self.scale))
+        self.boundaries.add(Boundary('5', 350, 345, 550, 355, self.scale))
+        self.boundaries.add(Boundary('6', 325, 90, 425, 100, self.scale))
+        self.boundaries.add(Boundary('7', 550, 120, 650, 130, self.scale))
+        self.boundaries.add(Boundary('9', 600, 345, 800, 355, self.scale))
+        self.boundaries.add(Boundary('10', 675, 315, 700, 355, self.scale))
+        self.boundaries.add(Boundary('11', 700, 285, 750, 355, self.scale))
+        self.boundaries.add(Boundary('12', 750, 255, 800, 355, self.scale))
+        self.boundaries.add(Boundary('13', 450, 345, 460, 450, self.scale))
 
     def createWater(self):
         self.waterBodies = set()
