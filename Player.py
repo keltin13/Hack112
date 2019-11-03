@@ -90,7 +90,7 @@ class GravityBoy(Player):
     def __init__(self, app, x, y):
         super().__init__(app, x, y)
         self.gravity = 1
-        self.jumpForce = -5
+        self.jumpForce = -8
         self.name = "GravityBoy"
 
     def standingOnPlatform(self):
