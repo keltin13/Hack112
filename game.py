@@ -124,7 +124,7 @@ class GameMode(Mode):
         canvas.create_text(mode.width//2, mode.height//2, fill = 'black',
                         text = f"{player}, swimTime = {player.waterCount}/{player.swimStamina}")
         for water in mode.waterBodies:
-            water.draw(canvas, mode.scale)
+            water.draw(canvas)
         for spike in mode.spikes:
             spike.draw(canvas)
         for boundary in mode.boundaries:
@@ -142,6 +142,7 @@ class Introduction(GameMode):
         self.createBoundaries()
         self.createWater()
         self.createSpikes()
+        self.numActives = 4
         self.createButtons()
         self.init = [25, 230]
         self.players = [Player(self, self.init[0], self.init[1]),
@@ -155,25 +156,24 @@ class Introduction(GameMode):
 
     def createBoundaries(self):
         self.boundaries = set()
-        self.boundaries.add(Boundary('1', 0, 200, 50, 210, self.scale, False))
+        self.boundaries.add(Boundary('1', 0, 200, 50, 210, self.scale, False, 0))
         self.boundaries.add(Boundary('2', 0, 315, 50, 325, self.scale))
         self.boundaries.add(Boundary('3', 55, 345, 105, 355, self.scale))
         self.boundaries.add(Boundary('4', 60, 50, 110, 60, self.scale))
 
-        self.boundaries.add(Boundary('Shift 1', 150, 440, 300, 450, self.scale))
-        self.boundaries.add(Boundary('Shift 2', 150, 150, 300, 400, self.scale))
-        self.boundaries.add(Boundary('Shift 3', 150, 100, 300, 110, self.scale))
+        self.boundaries.add(Boundary('Shift 1', 150, 440, 300, 450, self.scale, order = 1))
+        self.boundaries.add(Boundary('Shift 2', 150, 150, 300, 400, self.scale, order = 2))
+        self.boundaries.add(Boundary('Shift 3', 150, 100, 300, 110, self.scale, order = 3))
 
         self.boundaries.add(Boundary('5', 375, 315, 385, 450, self.scale))
     
     def createButtons(self):
-        self.buttons = []
+        self.buttons = [None] * self.numActives
         for boundary in self.boundaries:
             if not boundary.enabled:
-                self.buttons.append(Button(50, 300, boundary))
+                self.buttons[boundary.order] = (Button(50, 300, boundary))
             if 'Shift' in boundary.name:
-                self.buttons.append(MovingButton(100, 100, boundary, boundary.left, boundary.top+100, boundary.right, boundary.bottom+100))
-                self.buttons.append(Button(50, 300, boundary))
+                self.buttons[boundary.order] = (MovingButton(100, 100, boundary, boundary.left, boundary.top+100, boundary.right, boundary.bottom+100))
 
     def createWater(self):
         self.waterBodies = set()
