@@ -53,7 +53,7 @@ class MainMenuMode(Mode):
 
     def keyPressed(mode, event):
         if event.key == 'Space':    # Press 'Space' to go to game
-            mode.app.setActiveMode(mode.app.level1)
+            mode.app.setActiveMode(mode.app.introLevel)
 
 class GameMode(Mode):
     def appStarted(mode):
@@ -170,6 +170,8 @@ class GameMode(Mode):
                 boundary.draw(canvas)
         if mode.activeButton < len(mode.buttons):
             mode.buttons[mode.activeButton].draw(canvas)
+        canvas.create_text(mode.width-5, mode.height//2, fill = 'black', anchor = 'e',
+                           text = "FINISH")
         player.draw(canvas)
 
     def getCachedImages(mode, image):
@@ -181,7 +183,7 @@ class Introduction(GameMode):
     def __init__(self):
         super().__init__()
         super().appStarted()
-        self.scale = 2
+        self.scale = 1
         self.createBoundaries()
         self.createWater()
         self.createSpikes()
@@ -350,7 +352,7 @@ class MyModalApp(ModalApp):
         app.timerDelay = 50
 
 def main():
-    app = MyModalApp(width=1600, height=900)
+    app = MyModalApp(width=800, height=450)
 
 if __name__ == '__main__':
     main()
