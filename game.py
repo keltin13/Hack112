@@ -16,12 +16,39 @@ def rgbString(red, green, blue):
     return "#%02x%02x%02x" % (red, green, blue)
 
 class MainMenuMode(Mode):
+    def appStarted(mode):
+        init1 = [mode.width/2-130, 3*mode.height/4]
+        init2 = [mode.width/2-40, 3*mode.height/4]
+        init3 = [mode.width/2+40, 3*mode.height/4]
+        init4 = [mode.width/2+130, 3*mode.height/4]
+        mode.players = [Player(mode, init1[0], init1[1]),
+                        GravityBoy(mode, init2[0], init2[1]),
+                        JumpMan(mode, init3[0], init3[1]),
+                        WaterBoy(mode, init4[0], init4[1])]
+        mode.timerCount = 0
+
+    def getCachedImages(mode, image):
+        if ('cachedPhotoImage' not in image.__dict__):
+            image.cachedPhotoImage = ImageTk.PhotoImage(image)
+        return image.cachedPhotoImage
+
+    def timerFired(mode):
+        mode.timerCount += 1
+        if mode.timerCount % 2 == 0:
+            for player in mode.players:
+                player.stepAnimation()
+
     def redrawAll(mode, canvas):
-        backgroundColor = rgbString(241, 156, 183)
+        backgroundColor = rgbString(176, 137, 233)
         canvas.create_rectangle(0, 0, mode.width, mode.height,
                                 fill = backgroundColor)
+        canvas.create_text(mode.width/2, mode.height/3, fill = 'black',
+                            text = 'Suicide Squad', font = 'Forte 50 bold')
         canvas.create_text(mode.width//2, mode.height//2, fill = 'black',
-                        text = "Press space to start")
+                        text = "Press space to start", font = 'Forte 20')
+        canvas.create_line(mode.width/4, 2*mode.height/3-20, 3*mode.width/4, 2*mode.height/3-20)
+        for player in mode.players:
+            player.draw(canvas)
 
     def keyPressed(mode, event):
         if event.key == 'Space':    # Press 'Space' to go to game
@@ -82,7 +109,7 @@ class GameMode(Mode):
             player.velocity[0] = 0
             if player.velocity[1] < 0:
                 player.velocity[1] = 0
-            player.velocity[1] -= player.gravity * 0.1       
+            player.velocity[1] -= player.gravity * 0.1
             if player.waterCount <= 0:
                 player.reset()
         else:
@@ -149,7 +176,7 @@ class Introduction(GameMode):
     def __init__(self):
         super().__init__()
         super().appStarted()
-        self.scale = 2
+        self.scale = 1
         self.createBoundaries()
         self.createWater()
         self.createSpikes()
@@ -171,13 +198,13 @@ class Introduction(GameMode):
         self.boundaries.add(Boundary(self, '2', 0, 315, 50, 325, self.scale))
         self.boundaries.add(Boundary(self, '3', 55, 345, 105, 355, self.scale))
         self.boundaries.add(Boundary(self, '4', 60, 50, 110, 60, self.scale))
-        self.boundaries.add(Boundary(self, 'Shift 1', 150, 440, 300, 450, self.scale, 
+        self.boundaries.add(Boundary(self, 'Shift 1', 150, 440, 300, 450, self.scale,
                                      order = 0, shiftY = -95))
-        self.boundaries.add(Boundary(self, 'Shift 2', 150, 150, 295, 355, self.scale, 
+        self.boundaries.add(Boundary(self, 'Shift 2', 150, 150, 295, 355, self.scale,
                                      order = 1, shiftY = -50))
-        self.boundaries.add(Boundary(self, 'Shift 3', 150, 100, 300, 110, self.scale, 
+        self.boundaries.add(Boundary(self, 'Shift 3', 150, 100, 300, 110, self.scale,
                                      order = 2, shiftY = -50))
-        self.boundaries.add(Boundary(self, 'Shift 4', 375, 280, 385, 400, self.scale, 
+        self.boundaries.add(Boundary(self, 'Shift 4', 375, 280, 385, 400, self.scale,
                                      order = 4, shiftY = 75))
         self.boundaries.add(Boundary(self, '5', 350, 345, 450, 355, self.scale))
         self.boundaries.add(Boundary(self, '6', 325, 60, 425, 70, self.scale))
@@ -231,7 +258,7 @@ class Level1(GameMode):
         self.activeButton = 0
         self.activePlayer = 0
         self.activeKeys = {'a': False, 'd': False, 'w': False, 's': False}
-    
+
     def createButtons(self):
         self.buttons = [None] * self.numActives
         for boundary in self.boundaries:
@@ -240,10 +267,10 @@ class Level1(GameMode):
                                                 self.buttonLocations[boundary.order][1], boundary))                      
             if 'Shift' in boundary.name:
                 self.buttons[boundary.order] = (MovingButton(self, self.buttonLocations[boundary.order][0],
-                                                self.buttonLocations[boundary.order][1], boundary, 
-                                                boundary.left + boundary.shiftX, 
-                                                boundary.top + boundary.shiftY, 
-                                                boundary.right + boundary.shiftX, 
+                                                self.buttonLocations[boundary.order][1], boundary,
+                                                boundary.left + boundary.shiftX,
+                                                boundary.top + boundary.shiftY,
+                                                boundary.right + boundary.shiftX,
                                                 boundary.bottom + boundary.shiftY))
 
     def createBoundaries(self):
@@ -291,6 +318,16 @@ class Level1(GameMode):
         self.spikes.add(Spikes(self, 'Spike 1', 0, 0, 50, 10, self.scale))
         self.spikes.add(Spikes(self, 'Spike 2', 50, 0, 100, 10, self.scale))
 
+class GameOverMode(Mode):
+    def redrawAll(mode, canvas):
+        backgroundColor = rgbString(176, 137, 233)
+        canvas.create_rectangle(0, 0, mode.width, mode.height,
+                                fill = backgroundColor)
+        canvas.create_text(mode.width/2, mode.height/3, fill = 'black',
+                            text = 'Congratulations', font = 'Forte 50 bold')
+        canvas.create_text(mode.width//2, mode.height//2, fill = 'black',
+                        text = "Thanks for playing Suicide Squad!", font = 'Forte 20')
+
 # From http://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
 class MyModalApp(ModalApp):
     def appStarted(app):
@@ -298,7 +335,8 @@ class MyModalApp(ModalApp):
         app.mainMenuMode = MainMenuMode()
         app.introLevel = Introduction()
         app.level1 = Level1()
-        app.setActiveMode(app.mainMenuMode) # Change to main menu
+        app.gameOver = GameOverMode()
+        app.setActiveMode(app.gameOver) # Change to main menu
         app.timerDelay = 50
 
 def main():
