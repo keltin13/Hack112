@@ -183,7 +183,7 @@ class Introduction(GameMode):
         self.numActives = 5
         self.buttonLocations = [(360, 335), (360, 335), (360, 335), (400, 335), (515, 90)]
         self.createButtons()
-        self.init = [25, 250]
+        self.init = [25*self.scale, 250*self.scale]
         self.players = [Player(self, self.init[0], self.init[1]),
                         GravityBoy(self, self.init[0], self.init[1]),
                         JumpMan(self, self.init[0], self.init[1]),
@@ -228,11 +228,11 @@ class Introduction(GameMode):
                                                 self.buttonLocations[boundary.order][1], boundary))
             if 'Shift' in boundary.name:
                 self.buttons[boundary.order] = (MovingButton(self, self.buttonLocations[boundary.order][0],
-                                                self.buttonLocations[boundary.order][1], boundary,
-                                                boundary.left + boundary.shiftX,
-                                                boundary.top + boundary.shiftY,
-                                                boundary.right + boundary.shiftX,
-                                                boundary.bottom + boundary.shiftY))
+                                                self.buttonLocations[boundary.order][1], boundary, 
+                                                boundary.left + boundary.shiftX*self.scale, 
+                                                boundary.top + boundary.shiftY*self.scale, 
+                                                boundary.right + boundary.shiftX*self.scale, 
+                                                boundary.bottom + boundary.shiftY*self.scale))
 
     def createSpikes(self):
         self.spikes = set()
@@ -262,9 +262,9 @@ class Level1(GameMode):
     def createButtons(self):
         self.buttons = [None] * self.numActives
         for boundary in self.boundaries:
-            if not boundary.enabled:
+            if boundary.order != -1:
                 self.buttons[boundary.order] = (Button(self, self.buttonLocations[boundary.order][0],
-                                                self.buttonLocations[boundary.order][1], boundary))
+                                                self.buttonLocations[boundary.order][1], boundary))                      
             if 'Shift' in boundary.name:
                 self.buttons[boundary.order] = (MovingButton(self, self.buttonLocations[boundary.order][0],
                                                 self.buttonLocations[boundary.order][1], boundary,
@@ -340,8 +340,7 @@ class MyModalApp(ModalApp):
         app.timerDelay = 50
 
 def main():
-    app = MyModalApp(width=800, height=450)
-    #app = MyModalApp(width=960, height=540)
+    app = MyModalApp(width=1600, height=900)
 
 if __name__ == '__main__':
     main()

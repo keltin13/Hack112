@@ -8,6 +8,9 @@ from PIL import *
 import random
 
 class Boundary(object):
+    sprite = None
+    photoImage = None
+    
     def __init__(self, app, name, left, top, right, bottom, scale, enabled = True, order = -1, shiftY = 0, shiftX = 0):
         self.app = app
         self.name = name
@@ -41,11 +44,11 @@ class Boundary(object):
 class Spikes(Boundary):
     def importSprites(self):
         spike2 = 'Assets/spikes2.png'
-        self.sprite = (Image.open(spike2).resize((50, 50)))
+        Boundary.sprite = (Image.open(spike2).resize((50, 50)))
+        Boundary.photoImage = self.app.getCachedImages(Boundary.sprite)
 
     def draw(self, canvas):
         start = self.left + 25
-        photoImage = self.app.getCachedImages(self.sprite)
         while start <= self.right - self.left:
-            canvas.create_image(start, self.top + 25, image=photoImage)
+            canvas.create_image(start, self.top + 25, image=Boundary.photoImage)
             start += 50
