@@ -28,35 +28,31 @@ class Player(object):
 
     def draw(self, canvas):
         x, y = self.pos[0], self.pos[1]
-        canvas.create_rectangle(x-self.width//2, y-self.height//2,
-                                x+self.width//2, y+self.height//2,
+        canvas.create_rectangle((x-self.width//2), (y-self.height//2),
+                                (x+self.width//2), (y+self.height//2),
                                 fill = 'black')
-    
+
     def up(self):
         if self.underwater:
             self.velocity[1] = -self.movementSpeed*0.8
         elif self.standingOnPlatform():
             self.velocity[1] = -self.jumpForce
-            
+
     def down(self):
         if self.underwater:
             self.velocity[1] = self.movementSpeed*0.8
-    
+
     def left(self):
         if self.underwater:
             self.velocity[0] = -self.movementSpeed*0.8
         else:
             self.velocity[0] = -self.movementSpeed
+
     def right(self):
         if self.underwater:
             self.velocity[0] = self.movementSpeed*0.8
         else:
             self.velocity[0] = self.movementSpeed
-    
-    def returnToPlatform(self):
-        while self.standingOnPlatform():
-            self.pos[1] -= 1
-        self.pos[1] += 1
 
     def standingOnPlatform(self):
         return (self.app.checkInBounds(self.pos[0], self.pos[1] + 1 + self.height//2)
@@ -78,7 +74,7 @@ class Player(object):
             self.pos[0] = self.app.width - self.width//2
         elif self.pos[0] - self.width//2 <= 0:
             self.pos[0] = self.width//2
-    
+
 class WaterBoy(Player):
     def __init__(self, app, x, y):
         super().__init__(app, x, y)
@@ -88,7 +84,7 @@ class WaterBoy(Player):
 
 class GravityBoy(Player):
     def __init__(self, app, x, y):
-        super().__init__(app, x, y) 
+        super().__init__(app, x, y)
         self.gravity = 1
         self.jumpForce = -5
         self.name = "GravityBoy"

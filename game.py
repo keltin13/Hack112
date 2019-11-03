@@ -7,7 +7,7 @@ from tkinter import *
 from cmu_112_graphics import *
 
 from Player import *
-from Boundary import Boundary
+from Boundary import *
 from Water import Water
 
 # From http://www.cs.cmu.edu/~112/notes/notes-graphics-part2.html
@@ -28,7 +28,7 @@ class MainMenuMode(Mode):
 
 class GameMode(Mode):
     def appStarted(mode):
-        pass
+        mode.activeKeys = {'a': False, 'd': False, 'w': False, 's': False}
 
     def keyPressed(mode, event):
         if event.key == 'q':
@@ -41,28 +41,35 @@ class GameMode(Mode):
             mode.players[mode.activePlayer].up()
         elif event.key in mode.activeKeys:
             mode.activeKeys[event.key] = True
-    
+
     def keyReleased(mode, event):
         if event.key in mode.activeKeys:
             mode.activeKeys[event.key] = False
-    
+
     def checkInBounds(mode, x, y):
         for b in mode.boundaries:
             if b.left <= x <= b.right and b.top <= y <= b.bottom:
                 return True
         return False
-    
+
     def checkIntersect(mode, player, boundsList):
         for b in boundsList:
-            if b.left <= player.x <= b.right and b.top <= player.y <= b.bottom:
+            if (player.pos[0] + player.width//2 >= b.left and
+                player.pos[0] - player.width//2 <= b.right and
+                player.pos[1] + player.height//2 >= b.top and
+                player.pos[1] - player.height//2 <= b.bottom):
                 return True
         return False
-    
+
     def updatePhysics(mode):
         player = mode.players[mode.activePlayer]
         player.isUnderwater()
         for i in range(len(player.pos)):
             player.pos[i] += player.velocity[i]
+            if mode.checkIntersect(player, mode.boundaries):
+                while mode.checkIntersect(player, mode.boundaries):
+                    player.pos[i] -= (player.velocity[i]/abs(player.velocity[i]))
+                player.velocity[i] = 0
         if player.underwater:
             if player.waterCount == player.swimStamina:
                 player.velocity = [0,0]
@@ -76,9 +83,8 @@ class GameMode(Mode):
         else:
             player.velocity[0] = 0
             if player.standingOnPlatform():
-                player.returnToPlatform()
                 player.velocity[1] = 0
-            else:    
+            else:
                 player.velocity[1] -= player.gravity
         player.returnToBounds()
 
@@ -91,6 +97,8 @@ class GameMode(Mode):
             mode.players[mode.activePlayer].down()
         elif mode.activeKeys['w'] == True:
             mode.players[mode.activePlayer].up()
+        if mode.checkIntersect(mode.players[mode.activePlayer], mode.spikes):
+            mode.players[mode.activePlayer].reset()
         mode.updatePhysics()
 
     def redrawAll(mode, canvas):
@@ -100,6 +108,8 @@ class GameMode(Mode):
                         text = f"{player}, swimTime = {player.waterCount}/{player.swimStamina}")
         for water in mode.waterBodies:
             water.draw(canvas, mode.scale)
+        for spike in mode.spikes:
+            spike.draw(canvas)
         for boundary in mode.boundaries:
             boundary.draw(canvas)
         player.draw(canvas)
@@ -110,18 +120,38 @@ class Introduction(GameMode):
         super().appStarted()
         self.scale = 1
         self.createBoundaries()
-        self.init = [50, 350]
-        self.players = [Player(self, self.init[0], self.init[1]), 
+        self.createWater()
+        self.createSpikes()
+        self.init = [25, 230]
+        self.players = [Player(self, self.init[0], self.init[1]),
                         GravityBoy(self, self.init[0], self.init[1]),
-                        JumpMan(self, self.init[0], self.init[1])]
+                        JumpMan(self, self.init[0], self.init[1]),
+                        WaterBoy(self,self.init[0],self.init[1])]
         self.playerTypes = len(self.players)
         self.activePlayer = 0
         self.activeKeys = {'a': False, 'd': False, 'w': False, 's': False}
-        
+
     def createBoundaries(self):
         self.boundaries = set()
-        self.boundaries.add(Boundary('1', 0, 200, 100, 225))
-        self.boundaries.add(Boundary('2', 0, 450, 100, 475))
+        self.boundaries.add(Boundary('1', 0, 200, 50, 210, self.scale))
+        self.boundaries.add(Boundary('2', 0, 315, 50, 325, self.scale))
+        self.boundaries.add(Boundary('3', 55, 345, 105, 355, self.scale))
+        self.boundaries.add(Boundary('4', 60, 50, 110, 60, self.scale))
+
+        self.boundaries.add(Boundary('Shift 1', 150, 440, 300, 450, self.scale))
+        self.boundaries.add(Boundary('Shift 2', 150, 150, 300, 400, self.scale))
+        self.boundaries.add(Boundary('Shift 3', 150, 100, 300, 110, self.scale))
+
+        self.boundaries.add(Boundary('5', 375, 315, 385, 450, self.scale))
+
+    def createWater(self):
+        self.waterBodies = set()
+        self.waterBodies.add(Water(0, 350, 800, 450, self.scale))
+
+    def createSpikes(self):
+        self.spikes = set()
+        self.spikes.add(Spikes('Spike 1', 0, 0, 100, 20, self.scale))
+        self.spikes.add(Spikes('Spike 2', 100, 0, 200, 20, self.scale))
 
 class Level1(GameMode):
     def __init__(self):
@@ -130,14 +160,16 @@ class Level1(GameMode):
 # From http://www.cs.cmu.edu/~112/notes/notes-animations-part2.html
 class MyModalApp(ModalApp):
     def appStarted(app):
+        app.scale = app.width/800
         app.mainMenuMode = MainMenuMode()
         app.introLevel = Introduction()
         app.level1 = Level1()
-        app.setActiveMode(app.introLevel) # Change to main menu
+        app.setActiveMode(app.mainMenuMode) # Change to main menu
         app.timerDelay = 50
 
 def main():
-    app = MyModalApp(width=800, height=500)
+    app = MyModalApp(width=800, height=450)
+    #app = MyModalApp(width=960, height=540)
 
 if __name__ == '__main__':
     main()

@@ -4,19 +4,22 @@
 ##########################################
 
 class Boundary(object):
-    def __init__(self, name, left, top, right, bottom):
+    def __init__(self, name, left, top, right, bottom, scale):
         self.name = name
-        self.left = left
-        self.top = top
-        self.right = right
-        self.bottom = bottom
+        self.left = left*scale
+        self.top = top*scale
+        self.right = right*scale
+        self.bottom = bottom*scale
 
     def draw(self, canvas):
-        canvas.create_rectangle(self.left, self.top, self.right, self.bottom,
+        canvas.create_rectangle(self.left, self.top,
+                                self.right, self.bottom,
                                 fill = 'white', outline = 'red', width = 1)
-        canvas.create_line(self.left, self.top, self.right, self.bottom,
+        canvas.create_line(self.left, self.top,
+                            self.right, self.bottom,
                             fill = 'red')
-        canvas.create_line(self.right, self.top, self.left, self.bottom,
+        canvas.create_line(self.right, self.top,
+                            self.left, self.bottom,
                             fill = 'red')
 
     def getHashables(self):
@@ -28,3 +31,9 @@ class Boundary(object):
 
     def __hash__(self):
         return hash(self.getHashables())
+
+class Spikes(Boundary):
+    def draw(self, canvas):
+        midX = (self.right+self.left)/2
+        canvas.create_polygon(self.left, self.top, midX, self.bottom,
+                                self.right, self.top, fill = 'red')
