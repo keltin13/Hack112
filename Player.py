@@ -22,7 +22,7 @@ class Player(object):
         self.pos = copy.copy(self.app.init)
         self.velocity = [0,0]
 
-    def draw(self, canvas, scale):
+    def draw(self, canvas):
         x, y = self.pos[0], self.pos[1]
         canvas.create_rectangle((x-self.width//2), (y-self.height//2),
                                 (x+self.width//2), (y+self.height//2),
@@ -43,10 +43,6 @@ class Player(object):
             self.velocity[0] = -self.movementSpeed*0.8
         else:
             self.velocity[0] = -self.movementSpeed
-        intersect = self.app.getXIntersection(self.pos, self.width, self.height, -1)
-        if intersect:
-            self.velocity[0] = 0
-            self.pos[0] = intersect + self.width/2
 
     def right(self):
         if self.underwater:

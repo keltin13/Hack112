@@ -11,7 +11,7 @@ class Boundary(object):
         self.right = right*scale
         self.bottom = bottom*scale
 
-    def draw(self, canvas, scale):
+    def draw(self, canvas):
         canvas.create_rectangle(self.left, self.top,
                                 self.right, self.bottom,
                                 fill = 'white', outline = 'red', width = 1)
@@ -31,3 +31,9 @@ class Boundary(object):
 
     def __hash__(self):
         return hash(self.getHashables())
+
+class Spikes(Boundary):
+    def draw(self, canvas):
+        midX = (self.right+self.left)/2
+        canvas.create_polygon(self.left, self.top, midX, self.bottom,
+                                self.right, self.top, fill = 'red')

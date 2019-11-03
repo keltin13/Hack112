@@ -7,7 +7,7 @@ from tkinter import *
 from cmu_112_graphics import *
 
 from Player import *
-from Boundary import Boundary
+from Boundary import *
 from Water import Water
 
 # From http://www.cs.cmu.edu/~112/notes/notes-graphics-part2.html
@@ -52,22 +52,6 @@ class GameMode(Mode):
                 return True
         return False
 
-    # Intersection calculator from notes
-    def boundaryIntersect(mode, b, ax0, ay0, ax1, ay1):
-        (bx0, by0, bx1, by1) = b.left, b.top, b.right, b.bottom
-        return ((ax1 >= bx0) and (bx1 >= ax0) and
-                (ay1 >= by0) and (by1 >= ay0))
-
-    def getXIntersection(mode, pos, w, h, dir):
-        x, y = pos[0], pos[1]
-        for b in mode.boundaries:
-            if mode.boundaryIntersect(b, x-w/2, y-h/2, x+w/2, y+h/2):
-                if dir == -1 and (b.left <= x-w/2 <= b.right):
-                    return b.right
-                elif dir == 1 and (b.right >= x+w/2 >= b.left):
-                    return b.left
-        return False
-
     def checkIntersect(mode, player, boundsList):
         for b in boundsList:
             if (player.pos[0] + player.width//2 >= b.left and
@@ -110,6 +94,8 @@ class GameMode(Mode):
             mode.players[mode.activePlayer].down()
         elif mode.activeKeys['w'] == True:
             mode.players[mode.activePlayer].up()
+        if mode.checkIntersect(mode.players[mode.activePlayer], mode.spikes):
+            mode.players[mode.activePlayer].reset()
         mode.updatePhysics()
 
     def redrawAll(mode, canvas):
@@ -118,10 +104,12 @@ class GameMode(Mode):
         canvas.create_text(mode.width//2, mode.height//2, fill = 'black',
                         text = f"{player}")
         for water in mode.waterBodies:
-            water.draw(canvas, mode.scale)
+            water.draw(canvas)
+        for spike in mode.spikes:
+            spike.draw(canvas)
         for boundary in mode.boundaries:
-            boundary.draw(canvas, mode.scale)
-        player.draw(canvas, mode.scale)
+            boundary.draw(canvas)
+        player.draw(canvas)
 
 class Introduction(GameMode):
     def __init__(self):
@@ -131,6 +119,7 @@ class Introduction(GameMode):
         self.scale = 1
         self.createBoundaries()
         self.createWater()
+        self.createSpikes()
         self.init = [25, 230]
         self.players = [Player(self, self.init[0], self.init[1]),
                         GravityBoy(self, self.init[0], self.init[1]),
@@ -156,6 +145,11 @@ class Introduction(GameMode):
     def createWater(self):
         self.waterBodies = set()
         self.waterBodies.add(Water(0, 350, 800, 450, self.scale))
+
+    def createSpikes(self):
+        self.spikes = set()
+        self.spikes.add(Spikes('Spike 1', 0, 0, 100, 20, self.scale))
+        self.spikes.add(Spikes('Spike 2', 100, 0, 200, 20, self.scale))
 
 class Level1(GameMode):
     def __init__(self):
