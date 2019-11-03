@@ -235,9 +235,9 @@ class Level1(GameMode):
     def createButtons(self):
         self.buttons = [None] * self.numActives
         for boundary in self.boundaries:
-            if not boundary.enabled:
+            if boundary.order != -1:
                 self.buttons[boundary.order] = (Button(self, self.buttonLocations[boundary.order][0],
-                                                self.buttonLocations[boundary.order][1], boundary))
+                                                self.buttonLocations[boundary.order][1], boundary))                      
             if 'Shift' in boundary.name:
                 self.buttons[boundary.order] = (MovingButton(self, self.buttonLocations[boundary.order][0],
                                                 self.buttonLocations[boundary.order][1], boundary, 

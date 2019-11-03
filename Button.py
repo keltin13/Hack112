@@ -24,7 +24,7 @@ class Button(object):
         self.importSprite()
 
     def activate(self):
-        self.boundary.enabled = True
+        self.boundary.enabled = not self.boundary.enabled
     
     def draw(self, canvas):
         canvas.create_image(self.x, self.y, image=Button.photoImage)
