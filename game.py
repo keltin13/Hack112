@@ -63,10 +63,7 @@ class GameMode(Mode):
 
     def updatePhysics(mode):
         player = mode.players[mode.activePlayer]
-        # if mode.checkIntersect(player, mode.waters):
-        #     player.underwater = True
-        # else:
-        #     player.underwater = False
+        player.isUnderwater()
         for i in range(len(player.pos)):
             player.pos[i] += player.velocity[i]
             if mode.checkIntersect(player, mode.boundaries):
@@ -74,23 +71,29 @@ class GameMode(Mode):
                     player.pos[i] -= (player.velocity[i]/abs(player.velocity[i]))
                 player.velocity[i] = 0
         if player.underwater:
-            player.velocity = [0,0]
+            if player.waterCount == player.swimStamina:
+                player.velocity = [0,0]
             player.waterCount -= 1
+            player.velocity[0] = 0
+            if player.velocity[1] < 0:
+                player.velocity[1] = 0
+            player.velocity[1] -= player.gravity * 0.1       
+            if player.waterCount <= 0:
+                player.reset()
         else:
-            player.waterCount = player.swimStamina
             player.velocity[0] = 0
             if player.standingOnPlatform():
                 player.velocity[1] = 0
             else:
                 player.velocity[1] -= player.gravity
-            player.returnToBounds()
+        player.returnToBounds()
 
     def timerFired(mode):
         if mode.activeKeys['a'] == True:
             mode.players[mode.activePlayer].left()
         elif mode.activeKeys['d'] == True:
             mode.players[mode.activePlayer].right()
-        elif mode.activeKeys['s'] == True:
+        if mode.activeKeys['s'] == True:
             mode.players[mode.activePlayer].down()
         elif mode.activeKeys['w'] == True:
             mode.players[mode.activePlayer].up()
@@ -102,9 +105,9 @@ class GameMode(Mode):
         player = mode.players[mode.activePlayer]
         canvas.create_rectangle(0, 0, mode.width, mode.height, fill = 'white')
         canvas.create_text(mode.width//2, mode.height//2, fill = 'black',
-                        text = f"{player}")
+                        text = f"{player}, swimTime = {player.waterCount}/{player.swimStamina}")
         for water in mode.waterBodies:
-            water.draw(canvas)
+            water.draw(canvas, mode.scale)
         for spike in mode.spikes:
             spike.draw(canvas)
         for boundary in mode.boundaries:
@@ -115,7 +118,6 @@ class Introduction(GameMode):
     def __init__(self):
         super().__init__()
         super().appStarted()
-        print(self.width)
         self.scale = 1
         self.createBoundaries()
         self.createWater()

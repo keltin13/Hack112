@@ -10,13 +10,17 @@ class Player(object):
         self.pos = [x, y]
         self.width = 10
         self.height = 20
-        self.swimStamina = 100
+        self.swimStamina = 75
         self.gravity = -1
         self.underwater = False
         self.waterCount = self.swimStamina
-        self.jumpForce = 5
+        self.jumpForce = 8
         self.movementSpeed = 5
         self.velocity = [0,0]
+        self.name = "Normal Boy"
+
+    def __repr__(self):
+        return self.name
 
     def reset(self):
         self.pos = copy.copy(self.app.init)
@@ -29,10 +33,10 @@ class Player(object):
                                 fill = 'black')
 
     def up(self):
-        if self.standingOnPlatform():
+        if self.underwater:
+            self.velocity[1] = -self.movementSpeed*0.8
+        elif self.standingOnPlatform():
             self.velocity[1] = -self.jumpForce
-        elif self.underwater:
-            self.velocity[1] = self.movementSpeed*0.8
 
     def down(self):
         if self.underwater:
@@ -52,7 +56,14 @@ class Player(object):
 
     def standingOnPlatform(self):
         return (self.app.checkInBounds(self.pos[0], self.pos[1] + 1 + self.height//2)
-                or self.pos[1] + self.height//2 + 1 > self.app.height)
+                or self.pos[1] + self.height//2 + 1 > self.app.height) 
+
+    def isUnderwater(self):
+        if self.app.checkIntersect(self, self.app.waterBodies):
+            self.underwater = True
+        else:
+            self.waterCount = self.swimStamina
+            self.underwater = False
 
     def returnToBounds(self):
         if self.pos[1] + self.height//2 >= self.app.height:
@@ -69,12 +80,14 @@ class WaterBoy(Player):
         super().__init__(app, x, y)
         self.swimStamina = 300
         self.waterCount = self.swimStamina
+        self.name = "Aquaman"
 
 class GravityBoy(Player):
     def __init__(self, app, x, y):
         super().__init__(app, x, y)
         self.gravity = 1
         self.jumpForce = -5
+        self.name = "GravityBoy"
 
     def standingOnPlatform(self):
         return (self.app.checkInBounds(self.pos[0], self.pos[1] - 1 - self.height//2)
@@ -88,4 +101,7 @@ class GravityBoy(Player):
 class JumpMan(Player):
     def __init__(self, app, x, y):
         super().__init__(app, x, y)
-        self.jumpForce = 10
+        self.jumpForce = 14
+        self.swimStamina = 0
+        self.waterCount = self.swimStamina
+        self.name = "Jump Man"
