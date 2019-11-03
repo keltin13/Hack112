@@ -3,8 +3,13 @@
 ## Keltin Grimes, Alex White, Kevin Xie ##
 ##########################################
 
+from tkinter import *
+from PIL import *
+import random
+
 class Boundary(object):
-    def __init__(self, name, left, top, right, bottom, scale, enabled = True, order = -1, shiftY = 0, shiftX = 0):
+    def __init__(self, app, name, left, top, right, bottom, scale, enabled = True, order = -1, shiftY = 0, shiftX = 0):
+        self.app = app
         self.name = name
         self.left = left*scale
         self.top = top*scale
@@ -13,17 +18,15 @@ class Boundary(object):
         self.enabled = enabled
         self.order = order
         self.shiftX, self.shiftY = shiftX, shiftY
+        self.importSprites()
+
+    def importSprites(self):
+        pass
 
     def draw(self, canvas):
         canvas.create_rectangle(self.left, self.top,
                                 self.right, self.bottom,
-                                fill = 'white', outline = 'red', width = 1)
-        canvas.create_line(self.left, self.top,
-                            self.right, self.bottom,
-                            fill = 'red')
-        canvas.create_line(self.right, self.top,
-                            self.left, self.bottom,
-                            fill = 'red')
+                                fill = 'sienna', outline = 'sienna', width = 1)
 
     def getHashables(self):
         return self.name
@@ -36,7 +39,13 @@ class Boundary(object):
         return hash(self.getHashables())
 
 class Spikes(Boundary):
+    def importSprites(self):
+        spike2 = 'Assets/spikes2.png'
+        self.sprite = (Image.open(spike2).resize((50, 50)))
+
     def draw(self, canvas):
-        midX = (self.right+self.left)/2
-        canvas.create_polygon(self.left, self.top, midX, self.bottom,
-                                self.right, self.top, fill = 'red')
+        start = self.left + 25
+        photoImage = self.app.getCachedImages(self.sprite)
+        while start <= self.right - self.left:
+            canvas.create_image(start, self.bottom, image=photoImage)
+            start += 50

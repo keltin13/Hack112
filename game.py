@@ -5,7 +5,7 @@
 
 from tkinter import *
 from cmu_112_graphics import *
-
+from PIL import *
 from Button import *
 from Player import *
 from Boundary import *
@@ -116,6 +116,12 @@ class GameMode(Mode):
         for button in mode.buttons:
             if isinstance(button, MovingButton) and button.updating:
                 button.update()
+        if mode.players[mode.activePlayer].velocity[0] < 0:
+            mode.players[mode.activePlayer].facingRight = False
+            mode.players[mode.activePlayer].stepAnimation()
+        elif mode.players[mode.activePlayer].velocity[0] > 0:
+            mode.players[mode.activePlayer].facingRight = True
+            mode.players[mode.activePlayer].stepAnimation()
         mode.updatePhysics()
 
     def redrawAll(mode, canvas):
@@ -134,6 +140,11 @@ class GameMode(Mode):
             mode.buttons[mode.activeButton].draw(canvas)
         player.draw(canvas)
 
+    def getCachedImages(mode, image):
+        if ('cachedPhotoImage' not in image.__dict__):
+            image.cachedPhotoImage = ImageTk.PhotoImage(image)
+        return image.cachedPhotoImage
+
 class Introduction(GameMode):
     def __init__(self):
         super().__init__()
@@ -143,9 +154,9 @@ class Introduction(GameMode):
         self.createWater()
         self.createSpikes()
         self.numActives = 5
-        self.buttonLocations = [(355, 335), (355, 335), (355, 335), (400, 335), (515, 90)]
+        self.buttonLocations = [(360, 335), (360, 335), (360, 335), (400, 335), (515, 90)]
         self.createButtons()
-        self.init = [25, 230]
+        self.init = [25, 250]
         self.players = [Player(self, self.init[0], self.init[1]),
                         GravityBoy(self, self.init[0], self.init[1]),
                         JumpMan(self, self.init[0], self.init[1]),
@@ -156,53 +167,49 @@ class Introduction(GameMode):
 
     def createBoundaries(self):
         self.boundaries = set()
-        self.boundaries.add(Boundary('1', 0, 150, 50, 160, self.scale))
-        self.boundaries.add(Boundary('2', 0, 315, 50, 325, self.scale))
-        self.boundaries.add(Boundary('3', 55, 345, 105, 355, self.scale))
-        self.boundaries.add(Boundary('4', 60, 50, 110, 60, self.scale))
-        self.boundaries.add(Boundary('Shift 1', 150, 440, 300, 450, self.scale, 
+        self.boundaries.add(Boundary(self, '1', 0, 150, 50, 160, self.scale))
+        self.boundaries.add(Boundary(self, '2', 0, 315, 50, 325, self.scale))
+        self.boundaries.add(Boundary(self, '3', 55, 345, 105, 355, self.scale))
+        self.boundaries.add(Boundary(self, '4', 60, 50, 110, 60, self.scale))
+        self.boundaries.add(Boundary(self, 'Shift 1', 150, 440, 300, 450, self.scale, 
                                      order = 0, shiftY = -95))
-        self.boundaries.add(Boundary('Shift 2', 150, 150, 295, 355, self.scale, 
+        self.boundaries.add(Boundary(self, 'Shift 2', 150, 150, 295, 355, self.scale, 
                                      order = 1, shiftY = -50))
-        self.boundaries.add(Boundary('Shift 3', 150, 100, 300, 110, self.scale, 
+        self.boundaries.add(Boundary(self, 'Shift 3', 150, 100, 300, 110, self.scale, 
                                      order = 2, shiftY = -50))
-        self.boundaries.add(Boundary('Shift 4', 375, 280, 385, 400, self.scale, 
+        self.boundaries.add(Boundary(self, 'Shift 4', 375, 280, 385, 400, self.scale, 
                                      order = 4, shiftY = 75))
-        self.boundaries.add(Boundary('5', 350, 345, 550, 355, self.scale))
-        self.boundaries.add(Boundary('6', 325, 60, 425, 70, self.scale))
-        self.boundaries.add(Boundary('Shift 5', 550, 70, 650, 80, self.scale,
+        self.boundaries.add(Boundary(self, '5', 350, 345, 450, 355, self.scale))
+        self.boundaries.add(Boundary(self, '6', 325, 60, 425, 70, self.scale))
+        self.boundaries.add(Boundary(self, 'Shift 5', 550, 70, 650, 80, self.scale,
                                      order = 3, shiftX = -80))
-        self.boundaries.add(Boundary('9', 600, 345, 800, 355, self.scale))
-        self.boundaries.add(Boundary('10', 675, 315, 700, 355, self.scale))
-        self.boundaries.add(Boundary('11', 700, 285, 750, 355, self.scale))
-        self.boundaries.add(Boundary('12', 750, 255, 800, 355, self.scale))
-        self.boundaries.add(Boundary('13', 450, 345, 460, 450, self.scale))
+        self.boundaries.add(Boundary(self, '9', 650, 345, 800, 355, self.scale))
+        self.boundaries.add(Boundary(self, '10', 675, 315, 700, 355, self.scale))
+        self.boundaries.add(Boundary(self, '11', 700, 285, 750, 355, self.scale))
+        self.boundaries.add(Boundary(self, '12', 750, 255, 800, 355, self.scale))
+        self.boundaries.add(Boundary(self, '13', 450, 345, 460, 450, self.scale))
 
     def createWater(self):
         self.waterBodies = set()
-        self.waterBodies.add(Water(0, 350, 800, 450, self.scale))
+        self.waterBodies.add(Water(self, 0, 350, 800, 450, self.scale))
 
     def createButtons(self):
         self.buttons = [None] * self.numActives
         for boundary in self.boundaries:
             if not boundary.enabled:
-                self.buttons[boundary.order] = (Button(self.buttonLocations[boundary.order][0],
+                self.buttons[boundary.order] = (Button(self, self.buttonLocations[boundary.order][0],
                                                 self.buttonLocations[boundary.order][1], boundary))
             if 'Shift' in boundary.name:
-                self.buttons[boundary.order] = (MovingButton(self.buttonLocations[boundary.order][0],
+                self.buttons[boundary.order] = (MovingButton(self, self.buttonLocations[boundary.order][0],
                                                 self.buttonLocations[boundary.order][1], boundary, 
                                                 boundary.left + boundary.shiftX, 
                                                 boundary.top + boundary.shiftY, 
                                                 boundary.right + boundary.shiftX, 
                                                 boundary.bottom + boundary.shiftY))
-        for boundary in self.spikes:
-            if not boundary.enabled:
-                self.buttons[boundary.order] = (Button(50, 300, boundary))
 
     def createSpikes(self):
         self.spikes = set()
-        self.spikes.add(Spikes('Spike 1', 0, 0, 100, 20, self.scale))
-        self.spikes.add(Spikes('Spike 2', 100, 0, 200, 20, self.scale))
+        self.spikes.add(Spikes(self, 'Spike 1', 0, 0, 800, 20, self.scale))
 
 class Level1(GameMode):
     def __init__(self):

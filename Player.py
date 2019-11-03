@@ -3,13 +3,15 @@
 ## Keltin Grimes, Alex White, Kevin Xie ##
 ##########################################
 import copy
+from tkinter import *
+from PIL import *
 
 class Player(object):
     def __init__(self, app, x, y):
         self.app = app
         self.pos = [x, y]
-        self.width = 10
-        self.height = 20
+        self.width = 20
+        self.height = 30
         self.swimStamina = 50
         self.gravity = -1
         self.underwater = False
@@ -18,6 +20,18 @@ class Player(object):
         self.movementSpeed = 5
         self.velocity = [0,0]
         self.name = "Normal Boy"
+        self.importSprites()
+
+    def importSprites(self):
+        url = 'Assets/normalBoy.png'
+        spritestrip = Image.open(url)
+        self.sprites = [ ]
+        for i in range(2):
+            sprite = spritestrip.crop((70*i, 0, 70*(i+1), 100))
+            sprite = sprite.resize((self.width, self.height))
+            self.sprites.append(sprite)
+        self.spriteCounter = 1
+        self.facingRight = True
 
     def __repr__(self):
         return self.name
@@ -28,9 +42,19 @@ class Player(object):
 
     def draw(self, canvas):
         x, y = self.pos[0], self.pos[1]
-        canvas.create_rectangle((x-self.width//2), (y-self.height//2),
-                                (x+self.width//2), (y+self.height//2),
-                                fill = 'black')
+        # canvas.create_rectangle((x-self.width//2), (y-self.height//2),
+        #                         (x+self.width//2), (y+self.height//2),
+        #                         fill = None, outline = 'black')
+        sprite = self.sprites[self.spriteCounter]
+        if self.facingRight:
+            photoImage = self.app.getCachedImages(sprite)
+        else:
+            sprite = sprite.transpose(Image.FLIP_LEFT_RIGHT)
+            photoImage = self.app.getCachedImages(sprite)
+        canvas.create_image(self.pos[0], self.pos[1], image=photoImage)
+
+    def stepAnimation(self):
+        self.spriteCounter = (1 + self.spriteCounter) % len(self.sprites)
 
     def up(self):
         if self.underwater:
@@ -86,12 +110,35 @@ class WaterBoy(Player):
         self.waterCount = self.swimStamina
         self.name = "Aquaman"
 
+    def importSprites(self):
+        url = 'Assets/waterBoy.png'
+        spritestrip = Image.open(url)
+        self.sprites = [ ]
+        for i in range(2):
+            sprite = spritestrip.crop((68*i, 0, 68*(i+1), 96))
+            sprite = sprite.resize((self.width, self.height))
+            self.sprites.append(sprite)
+        self.spriteCounter = 1
+        self.facingRight = True
+
 class GravityBoy(Player):
     def __init__(self, app, x, y):
         super().__init__(app, x, y)
         self.gravity = 1
         self.jumpForce = -8
         self.name = "GravityBoy"
+
+    def importSprites(self):
+        url = 'Assets/gravityBoy.png'
+        spritestrip = Image.open(url)
+        self.sprites = [ ]
+        for i in range(2):
+            sprite = spritestrip.crop((70*i, 0, 70*(i+1), 96))
+            sprite = sprite.resize((self.width, self.height))
+            sprite = sprite.transpose(Image.FLIP_TOP_BOTTOM)
+            self.sprites.append(sprite)
+        self.spriteCounter = 1
+        self.facingRight = True
 
     def standingOnPlatform(self):
         return ((self.app.checkInBounds(self.pos[0] + self.width//2, self.pos[1] - 1 - self.height//2)
@@ -111,3 +158,14 @@ class JumpMan(Player):
         self.swimStamina = 0
         self.waterCount = self.swimStamina
         self.name = "Jump Man"
+
+    def importSprites(self):
+        url = 'Assets/jumpBoy.png'
+        spritestrip = Image.open(url)
+        self.sprites = [ ]
+        for i in range(2):
+            sprite = spritestrip.crop((70*i, 0, 70*(i+1), 96))
+            sprite = sprite.resize((self.width, self.height))
+            self.sprites.append(sprite)
+        self.spriteCounter = 1
+        self.facingRight = True
