@@ -99,6 +99,12 @@ class GameMode(Mode):
             mode.players[mode.activePlayer].up()
         if mode.checkIntersect(mode.players[mode.activePlayer], mode.spikes):
             mode.players[mode.activePlayer].reset()
+        if mode.players[mode.activePlayer].velocity[0] < 0:
+            mode.players[mode.activePlayer].facingRight = False
+            mode.players[mode.activePlayer].stepAnimation()
+        elif mode.players[mode.activePlayer].velocity[0] > 0:
+            mode.players[mode.activePlayer].facingRight = True
+            mode.players[mode.activePlayer].stepAnimation()
         mode.updatePhysics()
 
     def redrawAll(mode, canvas):
@@ -113,6 +119,11 @@ class GameMode(Mode):
         for boundary in mode.boundaries:
             boundary.draw(canvas)
         player.draw(canvas)
+
+    def getCachedImages(mode, image, imageName):
+        if ('cachedPhotoImage' not in image.__dict__):
+            image.cachedPhotoImage = ImageTk.PhotoImage(image)
+        return image.cachedPhotoImage
 
 class Introduction(GameMode):
     def __init__(self):
