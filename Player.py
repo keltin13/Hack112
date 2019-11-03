@@ -53,15 +53,6 @@ class Player(object):
             self.velocity[0] = self.movementSpeed*0.8
         else:
             self.velocity[0] = self.movementSpeed
-        intersect = self.app.getXIntersection(self.pos, self.width, self.height, 1)
-        if intersect:
-            self.velocity[0] = 0
-            self.pos[0] = intersect - self.width/2
-
-    def returnToPlatform(self):
-        while self.standingOnPlatform():
-            self.pos[1] -= 1
-        self.pos[1] += 1
 
     def standingOnPlatform(self):
         return (self.app.checkInBounds(self.pos[0], self.pos[1] + 1 + self.height//2)

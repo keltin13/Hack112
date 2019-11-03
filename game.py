@@ -28,8 +28,7 @@ class MainMenuMode(Mode):
 
 class GameMode(Mode):
     def appStarted(mode):
-        #mode.scale = mode.app.scale
-        pass
+        mode.activeKeys = {'a': False, 'd': False, 'w': False, 's': False}
 
     def keyPressed(mode, event):
         if event.key == 'q':
@@ -71,7 +70,10 @@ class GameMode(Mode):
 
     def checkIntersect(mode, player, boundsList):
         for b in boundsList:
-            if b.left <= player.x <= b.right and b.top <= player.y <= b.bottom:
+            if (player.pos[0] + player.width//2 >= b.left and
+                player.pos[0] - player.width//2 <= b.right and
+                player.pos[1] + player.height//2 >= b.top and
+                player.pos[1] - player.height//2 <= b.bottom):
                 return True
         return False
 
@@ -83,6 +85,10 @@ class GameMode(Mode):
         #     player.underwater = False
         for i in range(len(player.pos)):
             player.pos[i] += player.velocity[i]
+            if mode.checkIntersect(player, mode.boundaries):
+                while mode.checkIntersect(player, mode.boundaries):
+                    player.pos[i] -= (player.velocity[i]/abs(player.velocity[i]))
+                player.velocity[i] = 0
         if player.underwater:
             player.velocity = [0,0]
             player.waterCount -= 1
@@ -90,7 +96,6 @@ class GameMode(Mode):
             player.waterCount = player.swimStamina
             player.velocity[0] = 0
             if player.standingOnPlatform():
-                player.returnToPlatform()
                 player.velocity[1] = 0
             else:
                 player.velocity[1] -= player.gravity
@@ -111,7 +116,7 @@ class GameMode(Mode):
         player = mode.players[mode.activePlayer]
         canvas.create_rectangle(0, 0, mode.width, mode.height, fill = 'white')
         canvas.create_text(mode.width//2, mode.height//2, fill = 'black',
-                        text = "The game is here")
+                        text = f"{player}")
         for water in mode.waterBodies:
             water.draw(canvas, mode.scale)
         for boundary in mode.boundaries:
@@ -129,7 +134,8 @@ class Introduction(GameMode):
         self.init = [25, 230]
         self.players = [Player(self, self.init[0], self.init[1]),
                         GravityBoy(self, self.init[0], self.init[1]),
-                        JumpMan(self, self.init[0], self.init[1])]
+                        JumpMan(self, self.init[0], self.init[1]),
+                        WaterBoy(self,self.init[0],self.init[1])]
         self.playerTypes = len(self.players)
         self.activePlayer = 0
         self.activeKeys = {'a': False, 'd': False, 'w': False, 's': False}
