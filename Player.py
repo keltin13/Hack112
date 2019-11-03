@@ -78,7 +78,9 @@ class Player(object):
 class WaterBoy(Player):
     def __init__(self, app, x, y):
         super().__init__(app, x, y)
-        self.swimStamina = 300
+        self.airStamina = 75
+        self.airCount = self.airStamina
+        self.swimStamina = 500
         self.waterCount = self.swimStamina
         self.name = "Aquaman"
 

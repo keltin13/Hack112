@@ -6,6 +6,7 @@
 from tkinter import *
 from cmu_112_graphics import *
 
+from Button import *
 from Player import *
 from Boundary import *
 from Water import Water
@@ -48,17 +49,19 @@ class GameMode(Mode):
 
     def checkInBounds(mode, x, y):
         for b in mode.boundaries:
-            if b.left <= x <= b.right and b.top <= y <= b.bottom:
-                return True
+            if b.enabled == True:
+                if b.left <= x <= b.right and b.top <= y <= b.bottom:
+                    return True
         return False
 
     def checkIntersect(mode, player, boundsList):
         for b in boundsList:
-            if (player.pos[0] + player.width//2 >= b.left and
-                player.pos[0] - player.width//2 <= b.right and
-                player.pos[1] + player.height//2 >= b.top and
-                player.pos[1] - player.height//2 <= b.bottom):
-                return True
+            if b.enabled == True:
+                if (player.pos[0] + player.width//2 >= b.left and
+                    player.pos[0] - player.width//2 <= b.right and
+                    player.pos[1] + player.height//2 >= b.top and
+                    player.pos[1] - player.height//2 <= b.bottom):
+                    return True
         return False
 
     def updatePhysics(mode):
@@ -71,6 +74,8 @@ class GameMode(Mode):
                     player.pos[i] -= (player.velocity[i]/abs(player.velocity[i]))
                 player.velocity[i] = 0
         if player.underwater:
+            if isinstance(player, WaterBoy):
+                player.airCount = player.airStamina
             if player.waterCount == player.swimStamina:
                 player.velocity = [0,0]
             player.waterCount -= 1
@@ -81,6 +86,11 @@ class GameMode(Mode):
             if player.waterCount <= 0:
                 player.reset()
         else:
+            if isinstance(player, WaterBoy):
+                player.airCount -= 1
+                if player.airCount <= 0:
+                    player.airCount = player.airStamina
+                    player.reset()
             player.velocity[0] = 0
             if player.standingOnPlatform():
                 player.velocity[1] = 0
@@ -99,6 +109,13 @@ class GameMode(Mode):
             mode.players[mode.activePlayer].up()
         if mode.checkIntersect(mode.players[mode.activePlayer], mode.spikes):
             mode.players[mode.activePlayer].reset()
+        if mode.activeButton < len(mode.buttons):
+            if mode.checkIntersect(mode.players[mode.activePlayer], [mode.buttons[mode.activeButton]]):
+                mode.buttons[mode.activeButton].activate()
+                mode.activeButton += 1
+        for button in mode.buttons:
+            if isinstance(button, MovingButton) and button.updating:
+                button.update()
         mode.updatePhysics()
 
     def redrawAll(mode, canvas):
@@ -111,7 +128,10 @@ class GameMode(Mode):
         for spike in mode.spikes:
             spike.draw(canvas)
         for boundary in mode.boundaries:
-            boundary.draw(canvas)
+            if boundary.enabled:
+                boundary.draw(canvas)
+        if mode.activeButton < len(mode.buttons):
+            mode.buttons[mode.activeButton].draw(canvas)
         player.draw(canvas)
 
 class Introduction(GameMode):
@@ -122,6 +142,7 @@ class Introduction(GameMode):
         self.createBoundaries()
         self.createWater()
         self.createSpikes()
+        self.createButtons()
         self.init = [25, 230]
         self.players = [Player(self, self.init[0], self.init[1]),
                         GravityBoy(self, self.init[0], self.init[1]),
@@ -129,11 +150,12 @@ class Introduction(GameMode):
                         WaterBoy(self,self.init[0],self.init[1])]
         self.playerTypes = len(self.players)
         self.activePlayer = 0
+        self.activeButton = 0
         self.activeKeys = {'a': False, 'd': False, 'w': False, 's': False}
 
     def createBoundaries(self):
         self.boundaries = set()
-        self.boundaries.add(Boundary('1', 0, 200, 50, 210, self.scale))
+        self.boundaries.add(Boundary('1', 0, 200, 50, 210, self.scale, False))
         self.boundaries.add(Boundary('2', 0, 315, 50, 325, self.scale))
         self.boundaries.add(Boundary('3', 55, 345, 105, 355, self.scale))
         self.boundaries.add(Boundary('4', 60, 50, 110, 60, self.scale))
@@ -143,6 +165,15 @@ class Introduction(GameMode):
         self.boundaries.add(Boundary('Shift 3', 150, 100, 300, 110, self.scale))
 
         self.boundaries.add(Boundary('5', 375, 315, 385, 450, self.scale))
+    
+    def createButtons(self):
+        self.buttons = []
+        for boundary in self.boundaries:
+            if not boundary.enabled:
+                self.buttons.append(Button(50, 300, boundary))
+            if 'Shift' in boundary.name:
+                self.buttons.append(MovingButton(100, 100, boundary, boundary.left, boundary.top+100, boundary.right, boundary.bottom+100))
+                self.buttons.append(Button(50, 300, boundary))
 
     def createWater(self):
         self.waterBodies = set()
