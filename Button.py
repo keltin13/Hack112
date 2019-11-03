@@ -7,9 +7,10 @@ from tkinter import *
 from PIL import *
 import random
 
-class Button(object):
+class NewButton(object):
     sprite = None
     photoImage = None
+
     def __init__(self, app, x, y, boundary, enabled = True):
         self.app = app
         self.x = x*self.app.scale
@@ -34,8 +35,8 @@ class Button(object):
         Button.sprite = (Image.open(candy).resize((self.right-self.left, self.bottom-self.top)))
         Button.photoImage = self.app.getCachedImages(Button.sprite)
 
-class MovingButton(Button):
-    def __init__(self, app, x, y, boundary, left, top, right, bottom):
+class MovingButton(NewButton):
+    def __init__(self, app, x, y, boundary, left, top, right, bottom, enabled = True):
         super().__init__(app, x, y, boundary)
         self.newLeft = left
         self.newTop = top
